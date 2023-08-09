@@ -24,5 +24,5 @@ chrono = { version = "0.4.26", features = ['clock', 'wasmbind', 'std', 'serde'] 
 sse-codec = "0.3.2"
 
 [dev-dependencies]
-tokio-test = "*"
-tokio = { version = "*", features = ["full"] }
+tokio-test = "^0.4.0"
+tokio = { version = "^1.28.0", features = ["full"] }

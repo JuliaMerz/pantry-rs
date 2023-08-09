@@ -6,7 +6,7 @@ authors = ["Julia Merz <julia@jmerz.is>"]
 description = "Rust API for working with the pantry project, found in https://github.com/JuliaMerz/pantry"
 repository = "https://github.com/JuliaMerz/pantry-rs"
 homepage = "https://github.com/JuliaMerz/pantry"
-licence = "MIT OR Apache-2.0"
+license = "MIT OR Apache-2.0"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

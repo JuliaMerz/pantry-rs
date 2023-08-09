@@ -1,12 +1,12 @@
 //! Low Level API Wrapper
 use crate::error::PantryError;
-use futures::stream::{FilterMap, Stream, StreamExt, TryStreamExt};
+use futures::stream::{Stream, StreamExt, TryStreamExt};
 use hyper;
 use hyper::body::HttpBody;
 use hyper::StatusCode;
-use hyper::{Body, Client};
+use hyper::{Client};
 use hyperlocal::UnixClientExt;
-use serde::{Deserialize, Serialize};
+
 use serde_json;
 use serde_json::Value;
 use sse_codec::{decode_stream, Event};
@@ -17,7 +17,7 @@ use std::pin::Pin;
 use uuid::Uuid;
 
 use crate::interface::{
-    LLMEvent, LLMEventInternal, LLMRegistryEntry, LLMRunningStatus, LLMStatus, UserInfo,
+    LLMEvent, LLMRegistryEntry, LLMRunningStatus, LLMStatus, UserInfo,
     UserPermissions, UserRequestStatus,
 };
 
@@ -1183,9 +1183,9 @@ impl PantryAPI {
         let resp = self
             .double_edge(hyper::Method::POST, body, format!("/prompt_session_stream"))
             .await?;
-        let mut bod = resp.into_body();
+        let bod = resp.into_body();
 
-        let mut stream = decode_stream(TryStreamExt::into_async_read(
+        let stream = decode_stream(TryStreamExt::into_async_read(
             bod.into_stream()
                 .map_err(|e| io::Error::new(io::ErrorKind::Other, e)),
         ));
@@ -1193,8 +1193,8 @@ impl PantryAPI {
         let events = stream.into_stream().filter_map(|x| async move {
             match x {
                 Ok(event) => match event {
-                    Event::Retry { retry } => None,
-                    Event::Message { id, event, data } => {
+                    Event::Retry { retry: _ } => None,
+                    Event::Message { id: _, event: _, data } => {
                         let llm_event: LLMEvent = serde_json::from_str(&data).ok()?;
                         Some(llm_event)
                     }
@@ -1205,7 +1205,7 @@ impl PantryAPI {
                 }
             }
         });
-        let mut out = Box::pin(events);
+        let out = Box::pin(events);
         // // println!("test2 {:?}", (out.next().into() as LLMEvent));
         // let item_option = out.next().await; // This will give you Option<LLMEvent>
         // match item_option {

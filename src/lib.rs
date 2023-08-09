@@ -40,17 +40,17 @@
 //! ```
 pub use self::error::PantryError;
 use self::interface::{
-    LLMEvent, LLMRegistryEntry, LLMStatus, UserInfo, UserPermissions, UserRequestStatus,
+    LLMRegistryEntry, LLMStatus, UserPermissions, UserRequestStatus,
 };
-use api::BareModelResponse;
+
 pub use api::PantryAPI;
 pub use api::{LLMFilter, LLMPreference};
-use hyper::Client;
-use hyperlocal::UnixClientExt;
+
+
 use interface::LLMRunningStatus;
 use serde_json::Value;
 use std::collections::HashMap;
-use std::sync::mpsc;
+
 use uuid::Uuid;
 
 pub mod api;

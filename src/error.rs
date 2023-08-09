@@ -1,6 +1,6 @@
 use hyper;
 use quick_error::quick_error;
-use serde;
+
 use serde_json;
 
 use std::convert::From;

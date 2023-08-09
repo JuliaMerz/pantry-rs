@@ -1,10 +1,10 @@
-use futures::stream::{FilterMap, Stream, StreamExt, TryStreamExt};
-use pantry_rs::interface::{LLMEvent, UserInfo, UserPermissions};
-use pantry_rs::{LLMSession, PantryClient};
-use serde_json;
+use futures::stream::{StreamExt};
+use pantry_rs::interface::{UserPermissions};
+use pantry_rs::{PantryClient};
+
 use std::collections::HashMap;
 use std::{thread, time};
-use tokio_test;
+
 
 #[tokio::test]
 async fn basic_workflow() {
@@ -29,7 +29,7 @@ async fn basic_workflow() {
 
     let mut timeout_counter = 120;
 
-    while (timeout_counter > 0) {
+    while timeout_counter > 0 {
         req_status = pantry.get_request_status(req_status.id).await.unwrap();
         if req_status.complete && req_status.accepted {
             break;
@@ -80,7 +80,7 @@ async fn bare_model_workflow() {
 
     let mut timeout_counter = 120;
 
-    while (timeout_counter > 0) {
+    while timeout_counter > 0 {
         req_status = pantry.get_request_status(req_status.id).await.unwrap();
         if req_status.complete && req_status.accepted {
             break;
@@ -91,7 +91,7 @@ async fn bare_model_workflow() {
 
     println!("Request accepted, continuing");
 
-    let (model, path) = pantry.bare_model_flex(None, None).await.unwrap();
+    let (_model, path) = pantry.bare_model_flex(None, None).await.unwrap();
     println!("lol {}", path);
 }
 //             .route("/register_user", post(register_user))

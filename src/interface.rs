@@ -160,7 +160,7 @@ pub enum LLMEventInternal {
 
 /// Structure representing user permissions, generally used for making requests.
 ///
-/// See documentation on [PantryAPI] for which calls require which permissions.
+/// See documentation on [crate::api::PantryAPI] for which calls require which permissions.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UserPermissions {
     // We flatten these in here for easier DB storage.

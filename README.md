@@ -40,12 +40,12 @@ let recv = ses.prompt_session("About me: ".into(), HashMap::new()).await.unwrap(
 ```
 
 If you aren't already running an LLM from the ui, you can use
-```
+``` rust
 pantry.load_llm_flex(None, None).await.unwrap();
 ```
 
 If you want to use your existing ggml infrastructure, you can get a bare model path
 
-```
+``` rust
 let (model, path) = pantry.bare_model_flex(None, None).await.unwrap();
 ```

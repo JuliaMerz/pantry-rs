@@ -11,10 +11,10 @@ Client library for the Pantry LLM API.
 
 ### Example
 
-It's strongly recommended that you use [PantryClient] and [LLMSession], which are a higher
-level wrapper around [PantryAPI].
+It's strongly recommended that you use [PantryClient](https://docs.rs/pantry-rs/latest/pantry_rs/struct.PantryClient.html) and [LLMSession](https://docs.rs/pantry-rs/latest/pantry_rs/struct.LLMSession.html), which are a higher
+level wrapper around [PantryAPI](https://docs.rs/pantry-rs/latest/pantry_rs/api/struct.PantryAPI.html).
 
-```
+``` rust
 let perms = UserPermissions {
     perm_superuser: false,
     perm_load_llm: false,

@@ -1,6 +1,6 @@
 [package]
 name = "pantry-rs"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 authors = ["Julia Merz <julia@jmerz.is>"]
 description = "Rust API for working with the pantry project, found in https://github.com/JuliaMerz/pantry"

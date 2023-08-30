@@ -16,7 +16,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 hyperlocal = "0.8"
 futures = "0.3.28"
-uuid = { version = "0.8", features = ["serde", "v4"] }
+uuid = { version = "1.3.4", features = ["serde", "v4"] }
 hyper = { version = "0.14", features = ["default", "stream"] }
 hyper-tls = "0.5"
 quick-error = "2.0.1"
@@ -26,3 +26,4 @@ sse-codec = "0.3.2"
 [dev-dependencies]
 tokio-test = "^0.4.0"
 tokio = { version = "^1.28.0", features = ["full"] }
+llm = "0.1.1"

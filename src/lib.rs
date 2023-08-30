@@ -39,13 +39,10 @@
 //! let (model, path) = pantry.bare_model_flex(None, None).await.unwrap();
 //! ```
 pub use self::error::PantryError;
-use self::interface::{
-    LLMRegistryEntry, LLMStatus, UserPermissions, UserRequestStatus,
-};
+use self::interface::{LLMRegistryEntry, LLMStatus, UserPermissions, UserRequestStatus};
 
 pub use api::PantryAPI;
 pub use api::{LLMFilter, LLMPreference};
-
 
 use interface::LLMRunningStatus;
 use serde_json::Value;

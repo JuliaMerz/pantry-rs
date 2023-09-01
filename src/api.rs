@@ -718,7 +718,7 @@ impl PantryAPI {
             .double_edge(
                 hyper::Method::POST,
                 body,
-                format!("/request_available_llms"),
+                format!("/get_available_llms"),
             )
             .await?;
         match resp.status() {

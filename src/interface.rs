@@ -214,6 +214,7 @@ pub struct LLMRegistryEntry {
 
     /// For security reasons, this gets overwritten by remote and returned
     /// when making either a download request or a download command.
+    #[serde(default)]
     pub backend_uuid: String,
     pub url: String,
 

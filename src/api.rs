@@ -670,7 +670,7 @@ impl PantryAPI {
         };
         let body = serde_json::to_string(&request_running_llms)?;
         let resp = self
-            .double_edge(hyper::Method::POST, body, format!("/request_running_llms"))
+            .double_edge(hyper::Method::POST, body, format!("/get_running_llms"))
             .await?;
         match resp.status() {
             StatusCode::OK => {

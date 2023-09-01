@@ -197,6 +197,7 @@ pub struct LLMSessionStatus {
 /// and using it requires config['model_architecture'] to be set according to
 /// the [rustformers/llm documentation](https://docs.rs/llm/latest/llm/enum.ModelArchitecture.html)
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct LLMRegistryEntry {
     pub id: String,
     pub family_id: String,

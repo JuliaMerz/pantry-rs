@@ -395,12 +395,28 @@ impl PantryClient {
             .await
     }
 
-    pub async fn unload_llm(&self, llm_uuid: Uuid) -> Result<LLMStatus, PantryError> {
+    /// Unloads/deactivates an LLM.
+    ///
+    /// Requires the [UserPermissions::perm_unload_llm] permission.
+    ///
+    /// # Arguments
+    /// * `llm_id` — UUID of the LLM, or the LLM's id. ID is unique on a single registry,
+    /// but not guaranteed unique over multiple. If multiple LLMs with the same id are running,
+    /// this will deactivate only one of them. Find running llms via [PantryClient::get_running_llms].
+    pub async fn unload_llm(&self, llm_id: String) -> Result<LLMStatus, PantryError> {
         self.client
-            .unload_llm(self.user_id.clone(), self.api_key.clone(), llm_uuid)
+            .unload_llm(self.user_id.clone(), self.api_key.clone(), llm_id)
             .await
     }
 
+    /// Gets the bare path of a model, useful if you want to use an LLM with your own runner.
+    ///
+    /// Requires the [UserPermissions::perm_bare_model] permission.
+    ///
+    /// # Arguments
+    /// * `filter` — A [LLMFilter] object, for what _must_ be true of an LLM to load it.
+    /// * `preference` — A [LLMPreference] object, for how to rank and then select from the LLMs
+    /// that pass the filter.
     pub async fn bare_model_flex(
         &self,
         filter: Option<LLMFilter>,
@@ -418,6 +434,14 @@ impl PantryClient {
         Ok((resp.model, resp.path))
     }
 
+    /// Gets the bare path of a model, useful if you want to use an LLM with your own runner.
+    ///
+    /// Requires the [UserPermissions::perm_bare_model] permission.
+    ///
+    /// # Arguments
+    /// * `llm_id` — UUID of the LLM. Or the LLM's id. ID is unique on a single registry,
+    /// but not guaranteed unique over multiple. If multiple LLMs with the same id are running,
+    /// this will deactivate only one of them. Find running llms via [PantryClient::get_running_llms].
     pub async fn bare_model(&self, llm_id: Uuid) -> Result<(LLMStatus, String), PantryError> {
         let resp = self
             .client

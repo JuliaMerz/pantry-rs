@@ -3,8 +3,8 @@ use crate::error::PantryError;
 use futures::stream::{Stream, StreamExt, TryStreamExt};
 use hyper;
 use hyper::body::HttpBody;
+use hyper::Client;
 use hyper::StatusCode;
-use hyper::{Client};
 use hyperlocal::UnixClientExt;
 
 use serde_json;
@@ -17,8 +17,8 @@ use std::pin::Pin;
 use uuid::Uuid;
 
 use crate::interface::{
-    LLMEvent, LLMRegistryEntry, LLMRunningStatus, LLMStatus, UserInfo,
-    UserPermissions, UserRequestStatus,
+    LLMEvent, LLMRegistryEntry, LLMRunningStatus, LLMStatus, UserInfo, UserPermissions,
+    UserRequestStatus,
 };
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -715,11 +715,7 @@ impl PantryAPI {
         };
         let body = serde_json::to_string(&request_available_llms)?;
         let resp = self
-            .double_edge(
-                hyper::Method::POST,
-                body,
-                format!("/get_available_llms"),
-            )
+            .double_edge(hyper::Method::POST, body, format!("/get_available_llms"))
             .await?;
         match resp.status() {
             StatusCode::OK => {
@@ -900,17 +896,17 @@ impl PantryAPI {
     ///
     /// * `user_id` — A UUID, obtained from [PantryAPI::register_user].
     /// * `api_key` — An API key, obtained from [PantryAPI::register_user]
-    /// * `llm_id` — UUID of an LLM.
+    /// * `llm_id` — UUID or model id of an LLM.
     pub async fn unload_llm(
         &self,
         user_id: Uuid,
         api_key: String,
-        llm_id: Uuid,
+        llm_id: String,
     ) -> Result<LLMStatus, PantryError> {
         let unload_llm_request = UnloadLLMRequest {
             user_id: user_id.to_string(),
             api_key,
-            llm_id: llm_id.to_string(),
+            llm_id,
         };
         let body = serde_json::to_string(&unload_llm_request)?;
         let resp = self
@@ -1194,7 +1190,11 @@ impl PantryAPI {
             match x {
                 Ok(event) => match event {
                     Event::Retry { retry: _ } => None,
-                    Event::Message { id: _, event: _, data } => {
+                    Event::Message {
+                        id: _,
+                        event: _,
+                        data,
+                    } => {
                         let llm_event: LLMEvent = serde_json::from_str(&data).ok()?;
                         Some(llm_event)
                     }

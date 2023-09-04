@@ -319,6 +319,26 @@ impl PantryClient {
             .await
     }
 
+    /// Creates a request to download a new model. Must be accepted by the system
+    /// owner (currently via the UI).
+    ///
+    /// # Arguments
+    ///
+    /// * `llm_registry_entry` — A valid LLM registry entry to download. This specifies
+    /// the location of the model as well as any metadata. For better usability, try
+    /// being comprehensive about this.
+    pub async fn download_llm(&self, reg: LLMRegistryEntry) -> Result<Uuid, PantryError> {
+        let val = self
+            .client
+            .download_llm(self.user_id.clone(), self.api_key.clone(), reg)
+            .await?;
+        let string_uuid = val.as_str().ok_or(PantryError::OtherFailure(
+            "failed to deserialize uuid".into(),
+        ))?;
+        Uuid::parse_str(string_uuid)
+            .map_err(|e| PantryError::OtherFailure("Failed to Deserialize UUID".into()))
+    }
+
     pub async fn request_load_llm(&self, llm_uuid: Uuid) -> Result<UserRequestStatus, PantryError> {
         self.client
             .request_load(self.user_id.clone(), self.api_key.clone(), llm_uuid)

@@ -462,12 +462,26 @@ impl PantryClient {
     /// * `llm_id` — UUID of the LLM. Or the LLM's id. ID is unique on a single registry,
     /// but not guaranteed unique over multiple. If multiple LLMs with the same id are running,
     /// this will deactivate only one of them. Find running llms via [PantryClient::get_running_llms].
-    pub async fn bare_model(&self, llm_id: Uuid) -> Result<(LLMStatus, String), PantryError> {
+    pub async fn bare_model(&self, llm_id: String) -> Result<(LLMStatus, String), PantryError> {
         let resp = self
             .client
             .bare_model(self.user_id.clone(), self.api_key.clone(), llm_id)
             .await?;
         Ok((resp.model, resp.path))
+    }
+
+    /// Gets the status of an LLM.
+    ///
+    /// Requires the [UserPermissions::perm_view_llms] permission.
+    ///
+    /// # Arguments
+    /// * `llm_id` — UUID of the LLM.
+    pub async fn llm_status(&self, llm_id: Uuid) -> Result<LLMStatus, PantryError> {
+        let resp = self
+            .client
+            .get_llm_status(self.user_id.clone(), self.api_key.clone(), llm_id)
+            .await?;
+        Ok(resp)
     }
 }
 

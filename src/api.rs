@@ -1237,7 +1237,7 @@ impl PantryAPI {
         &self,
         user_id: Uuid,
         api_key: String,
-        llm_id: Uuid,
+        llm_id: String,
     ) -> Result<BareModelResponse, PantryError> {
         let load_llm_request = BareModelRequest {
             user_id: user_id.to_string(),

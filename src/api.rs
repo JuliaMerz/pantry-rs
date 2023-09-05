@@ -1,5 +1,6 @@
 //! Low Level API Wrapper
 use crate::error::PantryError;
+use crate::interface;
 use futures::stream::{Stream, StreamExt, TryStreamExt};
 use hyper;
 use hyper::body::HttpBody;
@@ -151,7 +152,7 @@ struct UnloadLLMRequest {
 struct DownloadLLMRequest {
     user_id: String,
     api_key: String,
-    llm_registry_entry: String, // You might want to replace this with an actual LLMRegistryEntry type
+    llm_registry_entry: interface::LLMRegistryEntry, // You might want to replace this with an actual LLMRegistryEntry type
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -953,11 +954,10 @@ impl PantryAPI {
         api_key: String,
         llm_registry_entry: LLMRegistryEntry,
     ) -> Result<Value, PantryError> {
-        let reg_entry_string = serde_json::to_string(&llm_registry_entry)?;
         let download_llm_request = DownloadLLMRequest {
             user_id: user_id.to_string(),
             api_key,
-            llm_registry_entry: reg_entry_string,
+            llm_registry_entry,
         };
         let body = serde_json::to_string(&download_llm_request)?;
         let resp = self

@@ -264,11 +264,11 @@ pub struct BareModelResponse {
 #[derive(Clone)]
 pub struct PantryAPI {
     pub client: Client<hyper::client::connect::HttpConnector>,
-    pub base_url: String,
+    pub base_url: Option<String>,
 }
 
 impl PantryAPI {
-    pub fn new(base_url: String) -> Self {
+    pub fn new(base_url: Option<String>) -> Self {
         PantryAPI {
             client: Client::new(),
             base_url,
@@ -281,13 +281,25 @@ impl PantryAPI {
         body: String,
         path: String,
     ) -> Result<hyper::Response<hyper::body::Body>, PantryError> {
+        if let Some(url) = self.base_url.clone() {
+            let url3 = url + &path;
+            println!("url3: {:?}", url3);
+            let req3: hyper::Request<hyper::body::Body> = hyper::Request::builder()
+                .method(method.clone())
+                .header("Content-Type", "application/json")
+                .uri(url3)
+                .body(hyper::Body::from(body.clone()))?;
+            return Ok(self.client.request(req3).await?);
+        }
+
         let url1 = hyperlocal::Uri::new("/tmp/pantrylocal.sock", &path.clone());
         let req1: hyper::Request<hyper::body::Body> = hyper::Request::builder()
             .method(method.clone())
             .header("Content-Type", "application/json")
             .uri(url1)
             .body(hyper::Body::from(body.clone()))?;
-        let url2 = self.base_url.clone() + &path;
+        let DEFAULT_URL: String = "http://localhost:9404/".into();
+        let url2 = DEFAULT_URL.clone() + &path;
         let req2: hyper::Request<hyper::body::Body> = hyper::Request::builder()
             .method(method.clone())
             .header("Content-Type", "application/json")

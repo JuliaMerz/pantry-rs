@@ -1,10 +1,9 @@
-use futures::stream::{StreamExt};
-use pantry_rs::interface::{UserPermissions};
-use pantry_rs::{PantryClient};
+use futures::stream::StreamExt;
+use pantry_rs::interface::UserPermissions;
+use pantry_rs::PantryClient;
 
 use std::collections::HashMap;
 use std::{thread, time};
-
 
 #[tokio::test]
 async fn basic_workflow() {
@@ -21,7 +20,7 @@ async fn basic_workflow() {
         perm_bare_model: true,
     };
 
-    let (pantry, mut req_status) = PantryClient::register("testing".into(), perms)
+    let (pantry, mut req_status) = PantryClient::register("testing".into(), perms, None)
         .await
         .unwrap();
 
@@ -72,9 +71,13 @@ async fn bare_model_workflow() {
         perm_bare_model: true,
     };
 
-    let (pantry, mut req_status) = PantryClient::register("bare_model_test".into(), perms)
-        .await
-        .unwrap();
+    let (pantry, mut req_status) = PantryClient::register(
+        "bare_model_test".into(),
+        perms,
+        Some("http://localhost:9404".into()),
+    )
+    .await
+    .unwrap();
 
     //wait for permission requests to be fulfilled.
 

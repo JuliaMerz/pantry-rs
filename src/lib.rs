@@ -89,13 +89,15 @@ impl PantryClient {
     ///
     /// * `name` — used for debug output and manager display.
     /// * `permissions` — The permissions this api user wants.
+    /// * `url` — None for localhost (default). Some("https://<url>/") for remote.
     pub async fn register(
         name: String,
         permissions: UserPermissions,
+        url: Option<String>,
     ) -> Result<(Self, UserRequestStatus), PantryError> {
         let client = PantryAPI {
             client: hyper::Client::new(),
-            base_url: "http://localhost:9404/".into(),
+            base_url: url,
         };
         let res = client.register_user(name).await?;
 
@@ -139,10 +141,10 @@ impl PantryClient {
     ///
     /// * `user_id` — A UUID, originally obtained from [PantryClient::register].
     /// * `api_key` — An API key, originally obtained from [PantryClient::register]
-    pub fn login(user_id: Uuid, api_key: String) -> Self {
+    pub fn login(user_id: Uuid, api_key: String, url: Option<String>) -> Self {
         let client = PantryAPI {
             client: hyper::Client::new(),
-            base_url: "/".into(),
+            base_url: url,
         };
 
         PantryClient {

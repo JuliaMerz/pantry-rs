@@ -65,6 +65,9 @@ pub struct LLMStatus {
 
     pub local: bool,
     pub connector_type: String,
+
+    pub download_progress: f32,
+
     /*
      * Configuration for connectors. Varies by connector.
      *

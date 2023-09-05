@@ -384,10 +384,10 @@ impl PantryClient {
     ///
     /// # Arguments
     ///
-    /// * `llm_id` — A UUID for the LLM you want to load. Find one via [PantryClient::get_available_llms].
-    pub async fn load_llm(&self, llm_uuid: Uuid) -> Result<LLMRunningStatus, PantryError> {
+    /// * `llm_id` — A UUID or ID for the LLM you want to load. Find one via [PantryClient::get_available_llms].
+    pub async fn load_llm(&self, llm: String) -> Result<LLMRunningStatus, PantryError> {
         self.client
-            .load_llm(self.user_id.clone(), self.api_key.clone(), llm_uuid)
+            .load_llm(self.user_id.clone(), self.api_key.clone(), llm)
             .await
     }
 

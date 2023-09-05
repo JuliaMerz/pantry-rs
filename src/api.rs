@@ -850,12 +850,12 @@ impl PantryAPI {
     ///
     /// * `user_id` — A UUID, obtained from [PantryAPI::register_user].
     /// * `api_key` — An API key, obtained from [PantryAPI::register_user]
-    /// * `llm_id` — UUID of an LLM.
+    /// * `llm_id` — UUID or ID of an LLM. Will fail for duplicate IDs.
     pub async fn load_llm(
         &self,
         user_id: Uuid,
         api_key: String,
-        llm_id: Uuid,
+        llm_id: String,
     ) -> Result<LLMRunningStatus, PantryError> {
         let load_llm_request = LoadLLMRequest {
             user_id: user_id.to_string(),

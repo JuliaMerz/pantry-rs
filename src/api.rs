@@ -6,8 +6,6 @@ use hyper;
 use hyper::body::HttpBody;
 use hyper::Client;
 use hyper::StatusCode;
-use hyperlocal::UnixClientExt;
-
 use serde_json;
 use serde_json::Value;
 use sse_codec::{decode_stream, Event};
@@ -16,6 +14,9 @@ use std::fmt;
 use std::io; // for try_next()
 use std::pin::Pin;
 use uuid::Uuid;
+
+#[cfg(target_family = "unix")]
+use hyperlocal::UnixClientExt;
 
 use crate::interface::{
     LLMEvent, LLMRegistryEntry, LLMRunningStatus, LLMStatus, UserInfo, UserPermissions,
@@ -275,6 +276,28 @@ impl PantryAPI {
         }
     }
 
+    #[cfg(target_family = "windows")]
+    async fn double_edge(
+        &self,
+        method: hyper::Method,
+        body: String,
+        path: String,
+    ) -> Result<hyper::Response<hyper::body::Body>, PantryError> {
+        let url = match self.base_url.clone() {
+            Some(u) => u,
+            None => "http://localhost:9404/".into(),
+        };
+        let url3 = url + &path;
+        println!("url3: {:?}", url3);
+        let req3: hyper::Request<hyper::body::Body> = hyper::Request::builder()
+            .method(method.clone())
+            .header("Content-Type", "application/json")
+            .uri(url3)
+            .body(hyper::Body::from(body.clone()))?;
+        return Ok(self.client.request(req3).await?);
+    }
+
+    #[cfg(target_family = "unix")]
     async fn double_edge(
         &self,
         method: hyper::Method,

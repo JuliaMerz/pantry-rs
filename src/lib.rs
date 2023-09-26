@@ -169,7 +169,7 @@ impl PantryClient {
     //     todo!();
     // }
 
-    /// Creates a session for an LLM.
+    /// Creates a session for an LLM. Will use the "best" available LLM based on capability levels.
     ///
     /// A session is the "state" of a large language model, including its inference history
     /// and its active memory. For a remote LLM this might be effectively nothing.
@@ -219,7 +219,8 @@ impl PantryClient {
     ///
     /// # Arguments
     ///
-    /// * `id` — the UUID of the LLM we wish to use.
+    /// * `id` — the UUID of the LLM we wish to use, OR a machine-id. If machine ID, the API will
+    /// treat it like a flex request filtering on just id.
     /// * `parameters` — used as session_parameters. Check the UI or an LLMs registry entry
     /// to see which ones are available. Typically most parameters are set at inference time.
     /// Because the function does not know which LLM will be used at call time, Pantry will
@@ -321,8 +322,7 @@ impl PantryClient {
             .await
     }
 
-    /// Creates a request to download a new model. Must be accepted by the system
-    /// owner (currently via the UI).
+    /// Download a new model.
     ///
     /// # Arguments
     ///
@@ -330,6 +330,33 @@ impl PantryClient {
     /// the location of the model as well as any metadata. For better usability, try
     /// being comprehensive about this.
     pub async fn download_llm(&self, reg: LLMRegistryEntry) -> Result<Uuid, PantryError> {
+        let val = self
+            .client
+            .download_llm(self.user_id.clone(), self.api_key.clone(), reg)
+            .await?;
+        let string_uuid = val.as_str().ok_or(PantryError::OtherFailure(
+            "failed to deserialize uuid".into(),
+        ))?;
+        Uuid::parse_str(string_uuid)
+            .map_err(|e| PantryError::OtherFailure("Failed to Deserialize UUID".into()))
+    }
+
+    /// Get or download a new model.
+    ///
+    /// The system does a comparison for *functional* properties. That means it will ignore
+    /// differing descriptions, but will not ignore differeing parameters/settings/etc.
+    ///
+    /// You'll have to check for model availability via `get_status` after this call, and potentially wait
+    /// for a download to complete.
+    ///
+    /// Edge case: If the url has been updated to a different underlying model, this will NOT catch it.
+    ///
+    /// # Arguments
+    ///
+    /// * `llm_registry_entry` — A valid LLM registry entry to download. This specifies
+    /// the location of the model as well as any metadata. For better usability, try
+    /// being comprehensive about this.
+    pub async fn get_or_download_llm(&self, reg: LLMRegistryEntry) -> Result<Uuid, PantryError> {
         let val = self
             .client
             .download_llm(self.user_id.clone(), self.api_key.clone(), reg)

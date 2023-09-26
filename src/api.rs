@@ -156,6 +156,13 @@ struct DownloadLLMRequest {
     llm_registry_entry: interface::LLMRegistryEntry, // You might want to replace this with an actual LLMRegistryEntry type
 }
 
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct GetOrDownloadLLMRequest {
+    user_id: String,
+    api_key: String,
+    llm_registry_entry: interface::LLMRegistryEntry, // You might want to replace this with an actual LLMRegistryEntry type
+}
+
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 struct RequestStatusRequest {
     user_id: String,
@@ -1074,7 +1081,8 @@ impl PantryAPI {
     ///
     /// # Arguments
     ///
-    /// * `user_id` — A UUID, obtained from [PantryAPI::register_user].
+    /// * `user_id` — A UUID, obtained from [PantryAPI::register_user] OR a machine-id. The API
+    /// will attempt to match on UUID first, otherwise treat it as a flex request matching on id.
     /// * `api_key` — An API key, obtained from [PantryAPI::register_user]
     /// * `llm_id` — A UUID for which LLM to use.
     /// * `user_session_parameters` — A hashmap of _requested_ parameters. The returning
@@ -1331,6 +1339,42 @@ impl PantryAPI {
         let body = serde_json::to_string(&load_llm_request)?;
         let resp = self
             .double_edge(hyper::Method::POST, body, format!("/bare_model_flex"))
+            .await?;
+        match resp.status() {
+            StatusCode::OK => {
+                // Get the response body bytes.
+                let body_bytes = hyper::body::to_bytes(resp.into_body()).await?;
+
+                // Convert the body bytes to utf-8
+                // let body = String::from_slice(body_bytes.into()).unwrap();
+                let body_str = std::str::from_utf8(&body_bytes)?;
+                Ok(serde_json::from_str(&body_str)?)
+            }
+            code => {
+                let body_bytes = hyper::body::to_bytes(resp.into_body()).await?;
+
+                // Convert the body bytes to utf-8
+                // let body = String::from_slice(body_bytes.into()).unwrap();
+                let body_str = std::str::from_utf8(&body_bytes)?;
+
+                Err(PantryError::ApiError(code, body_str.into()))
+            }
+        }
+    }
+    pub async fn get_or_download_llm(
+        &self,
+        user_id: Uuid,
+        api_key: String,
+        llm_registry_entry: LLMRegistryEntry,
+    ) -> Result<Value, PantryError> {
+        let download_llm_request = GetOrDownloadLLMRequest {
+            user_id: user_id.to_string(),
+            api_key,
+            llm_registry_entry,
+        };
+        let body = serde_json::to_string(&download_llm_request)?;
+        let resp = self
+            .double_edge(hyper::Method::POST, body, format!("/get_or_download_llm"))
             .await?;
         match resp.status() {
             StatusCode::OK => {

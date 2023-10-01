@@ -46,7 +46,7 @@ pub enum CapabilityType {
 /*
  * Represents a pantry LLM.
  */
-#[derive(serde::Deserialize, serde::Serialize, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Debug, Clone)]
 pub struct LLMStatus {
     pub id: String,
     pub family_id: String,
@@ -92,7 +92,7 @@ pub struct LLMStatus {
     pub running: bool,
 }
 //This is a lot like frontend::LLMRunningInfo, but limited for non-superusers
-#[derive(serde::Deserialize, serde::Serialize, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Debug, Clone)]
 pub struct LLMRunningStatus {
     pub llm_info: LLMStatus,
     pub uuid: String,

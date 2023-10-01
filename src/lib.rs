@@ -343,7 +343,8 @@ impl PantryClient {
             .map_err(|e| PantryError::OtherFailure("Failed to Deserialize UUID".into()))
     }
 
-    /// Get or download a new model.
+    /// Get or download a new model. Returns a model that is functionally equivalent to
+    /// what is set int he registry, either as an ongoing download or an existing model.
     ///
     /// The system does a comparison for *functional* properties. That means it will ignore
     /// differing descriptions, but will not ignore differeing parameters/settings/etc.

@@ -76,6 +76,7 @@ pub mod interface;
 ///
 /// The same is true for the _id or _flex calls to load and prompt LLMs: Be specific for yourself,
 /// and as broad as possible with others.
+#[derive(Clone, Debug)]
 pub struct PantryClient {
     /// user_id is a UUID representing the remote user
     pub user_id: Uuid,

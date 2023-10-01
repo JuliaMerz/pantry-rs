@@ -269,7 +269,7 @@ pub struct BareModelResponse {
 /// PantryAPI is a thin wrapper, just meant to minimize retyping of
 /// client and baseurl in function calls. Feel free to make multiple,
 /// or to clone.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PantryAPI {
     pub client: Client<hyper::client::connect::HttpConnector>,
     pub base_url: Option<String>,

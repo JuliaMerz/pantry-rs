@@ -1,6 +1,8 @@
 use futures::stream::StreamExt;
-use pantry_rs::interface::UserPermissions;
+use maplit::hashmap;
+use pantry_rs::interface::{LLMConnectorType, LLMRegistryEntry, UserPermissions};
 use pantry_rs::PantryClient;
+use uuid::Uuid;
 
 use std::collections::HashMap;
 use std::{thread, time};
@@ -11,7 +13,7 @@ async fn basic_workflow() {
         perm_superuser: false,
         perm_load_llm: true,
         perm_unload_llm: false,
-        perm_download_llm: false,
+        perm_download_llm: true,
         perm_session: true, //this is for create_session AND prompt_session
         perm_request_download: true,
         perm_request_load: true,
@@ -25,6 +27,7 @@ async fn basic_workflow() {
         .unwrap();
 
     //wait for permission requests to be fulfilled.
+    //
 
     let mut timeout_counter = 120;
 
@@ -40,6 +43,44 @@ async fn basic_workflow() {
     println!("Request accepted, continuing");
     //We need at least one LLM.
     // aw!(pantry.load_llm_flex(None, None)).unwrap();
+    let reg = LLMRegistryEntry {
+            id: "openchat-3".into(),
+            family_id: "llama".into(),
+            organization: "openchat".into(),
+            name: "Openchat LLM".into(),
+            license: "llama2".into(),
+            description: "openchat llm".into(),
+            homepage: "".into(),
+            capabilities: hashmap! {
+            "assistant".into() => -1,
+            "coding".into() => -1,
+            "general".into() => -1,
+            "writing".into() => -1
+            },
+            tags: Vec::new(),
+            requirements: "".into(),
+            backend_uuid: Uuid::new_v4().to_string(),
+            url: "https://huggingface.co/TheBloke/OpenChat_v3.2-GGML/resolve/main/openchat_v3.2.ggmlv3.q4_0.bin".into(),
+            config: hashmap! {
+                "model_architecture".into() => "llama".into(),
+            },
+            local: true,
+            connector_type: LLMConnectorType::LLMrs,
+            parameters: hashmap! {},
+            user_parameters: vec![
+                "sampler_string".into(),
+                "pre_prompt".into(),
+                "post_prompt".into(),
+            ],
+            session_parameters: hashmap! {},
+            user_session_parameters: vec!["system_prompt".into()],
+        };
+    let id = pantry.download_llm(reg).await.unwrap();
+    println!("uuid {:?}", id);
+    pantry
+        .await_download(id, |x| println!("Progress: {:?}", x))
+        .await
+        .unwrap();
 
     pantry.load_llm_flex(None, None).await.unwrap();
 
@@ -62,7 +103,7 @@ async fn bare_model_workflow() {
         perm_superuser: false,
         perm_load_llm: false,
         perm_unload_llm: false,
-        perm_download_llm: false,
+        perm_download_llm: true,
         perm_session: true, //this is for create_session AND prompt_session
         perm_request_download: true,
         perm_request_load: true,

@@ -8,7 +8,7 @@
 //!     perm_superuser: false,
 //!     perm_load_llm: false,
 //!     perm_unload_llm: false,
-//!     perm_download_llm: false,
+//!     perm_download_llm: true,
 //!     perm_session: true, //this is for create_session AND prompt_session
 //!     perm_request_download: true,
 //!     perm_request_load: true,
@@ -44,9 +44,11 @@ use self::interface::{LLMRegistryEntry, LLMStatus, UserPermissions, UserRequestS
 pub use api::PantryAPI;
 pub use api::{LLMFilter, LLMPreference};
 
+use futures_timer::Delay;
 use interface::LLMRunningStatus;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::{thread, time};
 
 use uuid::Uuid;
 
@@ -511,6 +513,35 @@ impl PantryClient {
             .get_llm_status(self.user_id.clone(), self.api_key.clone(), llm_id)
             .await?;
         Ok(resp)
+    }
+
+    /// Wait for an LLM to finish downloading.
+    ///
+    /// This is largely a quality of life method. Requires [UserPermissions::perm_view_llms] permission.
+    /// LLMs can take pretty long to download, meaning this function is best run in a separate
+    /// thread.
+    ///
+    /// # Arguments
+    /// * `llm_id` — UUID of the LLM.
+    /// * `progress_callback` — Takes in a float of download progress. Use it to print or
+    /// provide info.
+    pub async fn await_download<F>(
+        &self,
+        llm_id: Uuid,
+        mut progress_callback: F,
+    ) -> Result<LLMStatus, PantryError>
+    where
+        F: FnMut(f32) -> (),
+    {
+        let mut status = self.llm_status(llm_id).await?;
+        let one_sec = time::Duration::from_secs(1);
+        while status.download_progress < 100.0 {
+            progress_callback(status.download_progress);
+            Delay::new(one_sec).await;
+            status = self.llm_status(llm_id).await?;
+        }
+        progress_callback(status.download_progress);
+        Ok(status)
     }
 }
 

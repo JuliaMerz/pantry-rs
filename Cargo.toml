@@ -21,6 +21,7 @@ hyper-tls = "0.5"
 quick-error = "2.0.1"
 chrono = { version = "0.4.26", features = ['clock', 'wasmbind', 'std', 'serde'] }
 sse-codec = "0.3.2"
+futures-timer = "3.0.2"
 
 [target.'cfg(not(windows))'.dependencies]
 hyperlocal = "0.8"
@@ -29,4 +30,5 @@ hyperlocal = "0.8"
 tokio-test = "^0.4.0"
 tokio = { version = "^1.28.0", features = ["full"] }
 llm = "0.1.1"
+maplit = "1.0.2"
 

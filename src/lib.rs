@@ -363,7 +363,7 @@ impl PantryClient {
     pub async fn get_or_download_llm(&self, reg: LLMRegistryEntry) -> Result<Uuid, PantryError> {
         let val = self
             .client
-            .download_llm(self.user_id.clone(), self.api_key.clone(), reg)
+            .get_or_download_llm(self.user_id.clone(), self.api_key.clone(), reg)
             .await?;
         let string_uuid = val.as_str().ok_or(PantryError::OtherFailure(
             "failed to deserialize uuid".into(),
